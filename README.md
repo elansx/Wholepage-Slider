@@ -7,21 +7,20 @@ Swiping works on both - mobile (touch) and desktop (mouse) devices.
 
 ### Getting started
 
-Place this script in your page header
+Place this stylesheet in your page header
 ```
-<script src="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.css">
 ```
 
 Now create structure for your sections and pages
 ```
-<div class="container>
+<div id="container>
     <section>
       <div class="page">
         <h1>First section</h1>
         <p>And his single page</p>
       </div> 
-    <section>
+    </section>
 
 
     <section>
@@ -34,12 +33,13 @@ Now create structure for your sections and pages
          <h1>Still second section</h1>
          <p>But his second page...</p>
        </div>
-    <section>
+    </section>
 </div>
 ```
 Kickstart the slider - place this code at the bottom of body element
 
 ```
+<script src="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.js"></script>
 <script>
     XYSlider("container", {
         colors: ['lightskyblue', 'orange']
