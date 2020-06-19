@@ -41,7 +41,7 @@ Kickstart the slider - place this code at the bottom of body element
 
 ```
 <script>
-    XYSlider("page", {
+    XYSlider("container", {
         colors: ['lightskyblue', 'orange']
     })
 </script>
