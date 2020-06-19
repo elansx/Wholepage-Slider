@@ -1,6 +1,6 @@
 ## Whole page slider
 
-You can see a working [demo here](https://elansx.github.io/Slider/) <a href="https://elansx.github.io/Slider/" target="_blank">demo here</a>
+You can see a working [demo here](https://elansx.github.io/Slider/)
 
 Swiping works on both - mobile (touch) and desktop (mouse) devices.
 
