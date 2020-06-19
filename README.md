@@ -24,13 +24,30 @@ Copy and paste this in your html file
        
     <section>
         <div class="page">
-            <h1>Section 1!</h1>
-            <p>Get ready for some awesomeness..</p>
+            <h1>First section</h1>
+            <p>..and it's first page</p>
         </div>  
               <div class="page">
-            <h1>Section 2 PAGE 2!</h1>
-            <p>Get ready for some awesomeness..</p>
+            <h1>First section</h1>
+            <p>..and it's second page</p>
         </div> 
+    </section>
+
+    <section>
+        <div class="page">
+            <h1>Second section</h1>
+            <p>..and it's first page</p>
+        </div>  
+        
+        <div class="page">
+            <h1>Second section</h1>
+            <p>..and it's second page</p>
+        </div> 
+
+        <div class="page">
+            <h1>Second section</h1>
+            <p>..and it's third page</p>
+        </div>
     </section>
     
     
@@ -44,3 +61,4 @@ Copy and paste this in your html file
 
 </body>
 </html>
+```
