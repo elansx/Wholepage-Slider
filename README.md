@@ -14,7 +14,8 @@ Place this stylesheet in your page header
 
 Now create structure for your sections and pages
 ```
-<div id="container>
+<body id="page">
+
     <section>
       <div class="page">
         <h1>First section</h1>
@@ -34,7 +35,10 @@ Now create structure for your sections and pages
          <p>But his second page...</p>
        </div>
     </section>
-</div>
+    
+<!-- Here goes the script -->
+
+</body>
 ```
 Kickstart the slider - place this code at the bottom of body element
 
