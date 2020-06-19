@@ -1,7 +1,6 @@
 body, html {
     margin: 0;
     padding: 0;
-    font-family: 'poppins';
 }
 
 body {
@@ -17,7 +16,6 @@ h1 {
 }
 
 p {
-    font-family: 'Cabin';
     font-weight: 100;
     font-size: calc(1em + 0.5vw);
 }
