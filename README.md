@@ -62,3 +62,8 @@ Copy and paste this in your html file
 </body>
 </html>
 ```
+## License
+
+MIT License
+
+Copyright (c) 2020 elansx
