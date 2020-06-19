@@ -38,7 +38,7 @@ Copy and paste this in your html file
             <h1>Second section</h1>
             <p>..and it's first page</p>
         </div>  
-        
+
         <div class="page">
             <h1>Second section</h1>
             <p>..and it's second page</p>
@@ -52,7 +52,7 @@ Copy and paste this in your html file
     
     
  
-    <script src="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.min.js"></script>
     <script>
         XYSlider("page", {
             colors: ['lightskyblue', 'orange']
