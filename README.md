@@ -1,6 +1,9 @@
 ## Whole page slider
 
-You can see working [demo here](https://elansx.github.io/Slider/)
+You can see a working [demo here](https://elansx.github.io/Slider/)
+
+Swiping works on both - mobile (touch) and desktop (mouse) devices.
+
 
 ### Getting started
 
