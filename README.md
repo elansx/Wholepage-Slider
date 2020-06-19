@@ -5,49 +5,42 @@ You can see a working [demo here](https://elansx.github.io/Slider/)
 Swiping works on both - mobile (touch) and desktop (mouse) devices.
 
 
-### Getting started
+### Quick start
 
-Place this stylesheet in your page header
-```
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.css">
-```
+Copy and paste this in your html file
 
-Now create structure for your sections and pages
 ```
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <title>XYSlider</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.css">
+    
+</head>
+
 <body id="page">
-
+       
     <section>
-      <div class="page">
-        <h1>First section</h1>
-        <p>And his single page</p>
-      </div> 
-    </section>
-
-
-    <section>
-       <div class="page">
-         <h1>Second section</h1>
-          <p>First page</p>
-       </div>
-
-       <div class="page">
-         <h1>Still second section</h1>
-         <p>But his second page...</p>
-       </div>
+        <div class="page">
+            <h1>Section 1!</h1>
+            <p>Get ready for some awesomeness..</p>
+        </div>  
+              <div class="page">
+            <h1>Section 2 PAGE 2!</h1>
+            <p>Get ready for some awesomeness..</p>
+        </div> 
     </section>
     
-<!-- Here goes the script -->
+    
+ 
+    <script src="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.js"></script>
+    <script>
+        XYSlider("page", {
+            colors: ['lightskyblue', 'orange']
+        })
+    </script>
 
 </body>
-```
-Kickstart the slider - place this code at the bottom of body element
-
-```
-<script src="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.js"></script>
-<script>
-    XYSlider("container", {
-        colors: ['lightskyblue', 'orange']
-    })
-</script>
-
-```
+</html>
