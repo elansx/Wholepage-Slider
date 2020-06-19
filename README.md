@@ -2,7 +2,12 @@
 
 You can see a working [demo here](https://elansx.github.io/Slider/)
 
-Swiping works on both - mobile (touch) and desktop (mouse) devices.
+## Features
+
+* No dependencies
+* Written in pure Javascript
+* Works great on mobile and desktop devices
+* Auto-generates navigation (buttons) based on sections and pages
 
 
 ### Quick start
