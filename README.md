@@ -52,7 +52,7 @@ Copy and paste this in your html file
     
     
  
-    <script src="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.js"></script>
     <script>
         XYSlider("page", {
             colors: ['lightskyblue', 'orange']
