@@ -2,12 +2,17 @@ body, html {
     margin: 0;
     padding: 0;
     font-family: 'roboto';
+
 }
 
 body {
     height: 100%;
     width: 100%;
     user-select: none;
+    overflow-y: hidden;
+    touch-action: none;
+    overscroll-behavior-y: contain;
+
 }
 
 
@@ -108,5 +113,4 @@ section {
     color: rgb(30, 30, 30);
     -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
     z-index: 999999; 
-
 }
