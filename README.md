@@ -1,6 +1,6 @@
 ## Whole page slider
 
-You can see a working [demo here](https://elansx.github.io/Slider/)
+You can see a working [demo here](https://elansx.github.io/Wholepage-Slider/)
 
 ## Features
 
