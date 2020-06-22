@@ -59,7 +59,7 @@ Copy and paste this in your html file
  
     <script src="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.js"></script>
     <script>
-        new WholePageSlider("page", {
+        new WholePageSlider("wholepage", {
             colors: ['lightskyblue', 'orange']
         })
     </script>
