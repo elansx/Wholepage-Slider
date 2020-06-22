@@ -1,7 +1,3 @@
-/* eslint-disable no-trailing-spaces */
-/* eslint-disable padded-blocks */
-/* eslint-disable no-multiple-empty-lines */
-// eslint-disable-next-line no-unused-vars
 const WholePageSlider = class {
   constructor (containerId, options) {
     this.container = document.getElementById(containerId)
