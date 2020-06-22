@@ -25,8 +25,8 @@ Copy and paste this in your html file
     
 </head>
 
-<body id="page">
-       
+<body>
+     <div id="wholepage">
     <section>
         <div class="page">
             <h1>First section</h1>
@@ -54,7 +54,7 @@ Copy and paste this in your html file
             <p>..and it's third page</p>
         </div>
     </section>
-    
+    </div>
     
  
     <script src="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.js"></script>
