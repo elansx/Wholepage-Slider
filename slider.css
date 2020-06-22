@@ -1,7 +1,7 @@
 body, html {
     margin: 0;
     padding: 0;
-    font-family: 'roboto';
+    font-family: 'Poppins', 'roboto';
 
 }
 
@@ -19,10 +19,11 @@ body {
 h1 {
     font-size: calc(2em + 1vw);
     margin: 0; padding: 0;
+    font-weight: 600;
 }
 
 p {
-    font-weight: 100;
+    font-weight: 200;
     font-size: calc(1em + 0.5vw);
 }
 
