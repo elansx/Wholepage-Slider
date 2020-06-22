@@ -1,333 +1,369 @@
-function XYSlider (container_id, options) {
-  const sections = document.getElementsByTagName('section')
-  const container = document.getElementById(container_id)
-  const colors = options.colors
-  const translate_pages = []
-  const current_page_per_section = []
-  const wait_time = 200
-  const percent = 20
+const WholePageSlider = class {
+  constructor (containerId, options) {
+    this.container = document.getElementById(containerId)
+    this.sections = document.getElementsByTagName('section')
 
-  let translateY_section = 0
-  let width = 100
-  let height = 100
-  let current_section = 0
-  let wait_scroll = false
-  let wait_page = false
-  let swiping = null
-  let swiping_direction = null
-  let moving = false
+    this.pagesPerSection = []
+    this.currentPage = []
+    this.currentSection = 0
 
-  // SECTION SWITCH BUTTONS (UP/DOWN BUTTONS)
-  const section_button_container = document.createElement('div')
-  section_button_container.className = 'section_selection'
-  container.appendChild(section_button_container)
+    this.isDragging = false
+    this.draggingPercent = 20
 
-  // INITILIZE ALL SECTIONS, PAGES (AND BUTTONS FOR PAGES)
+    this.waitAnimation = false
+    this.timeToAnimate = 300
+    
+    this.height = 100
+    this.width = 100
 
-  for (let index = 0; index < sections.length; index++) {
-    // INIT ARRAY FOR PAGES
-    translate_pages[index] = 0
-    current_page_per_section[index] = 0
-
-    // SET COLOR FOR EACH SECTION
-    sections[index].style.background = colors[index]
-
-    // CREATE RADIO BUTTONS FOR SECTIONS
-    const button_dots = document.createElement('input')
-    button_dots.type = 'radio'
-    button_dots.name = 'section'
-    button_dots.id = `section[${index}]`
-    button_dots.style.display = 'none'
-    button_dots.value = index
-    button_dots.onclick = function (e) {
-      if (wait_scroll) {
-        e.preventDefault()
-      } else {
-        scrollSections(this)
-      }
+    this.swipeStartDirection = null
+    this.swipeEndDirection = null
+    
+    this.options = {
+      ...options
     }
-    button_dots.checked = current_section === index
-    section_button_container.appendChild(button_dots)
+    this.translate = {
+      section: 0,
+      page: []
+    }
+    
+    this.touches = {
+      startX: null,
+      startY: null,
+      endX: null,
+      endY: null,
+      differenceX: null,
+      differenceY: null
+    }
+    
+    this.init()
+    this.setupEventListeners()
 
-    // CREATE LABELS FOR BUTTONS
-    const button_label = document.createElement('label')
-    button_label.htmlFor = `section[${index}]`
-    section_button_container.appendChild(button_label)
 
-    // COUNT PAGES IN EACH SECTION
-    const pages = sections[index].getElementsByClassName('page')
+  }
 
-    // IF THERE IS MORE THEN ONE PAGE DRAW BUTTONS
-    if (pages.length > 1) {
-      // CREATE BUTTON CONTAINER FOR PAGES (#1)
-      const page_button_container = document.createElement('div')
-      page_button_container.className = 'page_selection'
-      sections[index].appendChild(page_button_container)
+  init () {
+    // We need a container to store our buttons for section scroll
+    const sectionButtonContainer = this.createElement('div', { className: 'sectionButtonContainer' }, this.container)
 
-      // CREATE PAGE BUTTONS (FOR EVERY SECTION)
-      for (let i = 0; i < pages.length; i++) {
-        // DRAW BUTTONS AND PUT THEM IN CONTAINER (#1)
-        const page_button = document.createElement('input')
-        page_button.type = 'radio'
-        page_button.id = `page[${index}][${i}]`
-        page_button.name = `pagination[${index}]`
-        page_button.style.display = 'none'
-        page_button.value = i
-        page_button.onclick = function () { selectPages(this) }
-        page_button.checked = current_page_per_section[i] === i
-        page_button_container.appendChild(page_button)
 
-        // CREATE LABELS (VISUALS) FOR BUTTONS
-        const page_button_label = document.createElement('label')
-        page_button_label.htmlFor = `page[${index}][${i}]`
-        page_button_container.appendChild(page_button_label)
+
+    // Create elements for every section and apply styles
+    for (let index = 0; index < this.sections.length; index++) {
+      this.translate.page[index] = 0
+      this.currentPage[index] = 0
+      this.sections[index].style.background = this.options.colors ? this.options.colors[index] : 'white'
+      this.pagesPerSection[index] = this.sections[index].getElementsByClassName('page')
+
+
+      const sectionNavigationButton = this.createElement('input', {
+        type: 'radio',
+        name: 'sectionScrollButton',
+        id: `sectionId[${index}]`,
+        value: index,
+        onclick: this.switchAndTranslateSection.bind(this),
+        checked: this.currentSection === index,
+        style: {
+          display: 'none'
+        }
+      }, sectionButtonContainer)
+
+      this.createElement('label', { htmlFor: sectionNavigationButton.id }, sectionButtonContainer)
+
+
+
+
+      if (this.pagesPerSection[index].length > 1) {
+        
+        // We need a container where to store our navigation buttons for pages
+        const buttonContainer = this.createElement('div', { id: `pageButtonContainer[${index}]`, className: 'page_selection' }, this.sections[index])
+
+        for (let i = 0; i < this.pagesPerSection[index].length; i++) {
+
+          this.createElement('input', {
+            type: 'radio',
+            id: `page[${index}][${i}]`,
+            name: `pagination[${index}]`,
+            value: i,
+            checked: this.currentPage[i] === i,
+            onclick: this.switchAndTranslatePage.bind(this),
+            style: {
+              display: 'none'
+            }
+          }, buttonContainer)
+
+          this.createElement('label', {
+            htmlFor: `page[${index}][${i}]`
+          }, buttonContainer)
+
+        }
+
+        buttonContainer.style.left = `calc(50% - ${buttonContainer.getBoundingClientRect().width / 2}px)`
+        sectionButtonContainer.style.top = `calc(50% - ${sectionButtonContainer.getBoundingClientRect().height / 2}px)`
+
       }
 
-      // ALIGN BUTTONS IN CENTER OF SCREEN (BECAUSE WE NEVER KNOW DIMENSIONS OF THE BUTTON CONTAINER)
-      page_button_container.style.left = `calc(50% - ${page_button_container.getBoundingClientRect().width / 2}px)`
-      section_button_container.style.top = `calc(50% - ${section_button_container.getBoundingClientRect().height / 2}px)`
+
     }
   }
 
-  function scrollSections (e) {
-    // CHECK IF THERE IS ANY SECTIONS CREATED
-    if (!sections && sections.length <= 0) {
-      return
-    }
+ 
 
-    // IF WAITING FOR ANIMATION (SECTION SWITCH) TO COMPLETE - RETURN, BEFORE SWICHING NEXT SECTION
-    if (wait_scroll) {
+  switchAndTranslateSection (swipeOrClick) {
+   
+
+    if (!this.sections || this.sections.length < 1 || this.waitAnimation) {
       return
     } else {
-      wait_scroll = true
+      this.waitAnimation = true
     }
 
-    // DETECT SWIPE-UP OR SCROLL-UP AND PREVENT FROM CHANGING DIRECTION WHILE DRAGGING
-    if (((e.deltaY > 0 || e === 'up') && swiping_direction !== 'down') && current_section < sections.length - 1) {
-      current_section++
-      translateY_section -= height
-    }
 
-    if (((e.deltaY < 0 || e === 'down') && swiping_direction !== 'up') && current_section > 0) {
-      current_section--
-      translateY_section += height
-    } else if (e.type === 'click') {
-      // DETECT CLICK FROM NAVIGATION (BUTTON)
-      const click = parseInt(e.target.value) - current_section
-      current_section = parseInt(e.target.value)
-      translateY_section = translateY_section - (height * click)
+
+    if (((swipeOrClick.deltaY > 0 || swipeOrClick === 'up') && this.swipeStartDirection !== 'down') && (this.currentSection < this.sections.length - 1)) {
+      this.currentSection++
+      this.translate.section -= this.height
+      console.log('up')
+    } else
+    if (((swipeOrClick.deltaY < 0 || swipeOrClick === 'down') && this.swipeStartDirection !== 'up') && (this.currentSection > 0)) {
+      this.currentSection--
+      this.translate.section += this.height
+      console.log('down')
+    } else  
+    if (swipeOrClick.type === 'click') {
+      console.log('click')
+      const click = parseInt(swipeOrClick.target.value) - this.currentSection
+      this.currentSection = parseInt(swipeOrClick.target.value)
+      this.translate.section = this.translate.section - (this.height * click)
     } else {
-      // RESTORE SECTION POSITION, JUST IN CASE - IF THERE WAS DRAGGING UP OR DOWN, BUT CHANGED DIRECTION (TO LEFT OR RIGHT - CANCELED)
-      translateY_section = Math.round(translateY_section / 100) * 100
+      this.translate.section = Math.round(this.translate.section / 100) * 100
     }
 
-    // MOVING/DRAGGING ENDED SO RESTORE SETTINGS
-    moving = false
-    height = 100
-
+  
+    
     // SHOW ACTIVE BUTTON - WHICH SECTION IS SELECTED (DISPLAYED)
-    const button = document.getElementById(`section[${current_section}]`)
+    const button = document.getElementById(`sectionId[${this.currentSection}]`)
     button.checked = true
-
-    // THE MAIN PART - UPDATE AND SWITCH SECTIONS (ANIMATE VIA CSS)
-    for (let index = 0; index < sections.length; index++) {
-      sections[index].style.transform = `translateY(${translateY_section}%)`
-    }
-
-    // LET PREVIOUS ANIMATION COMPLETE BEFORE SWITCHING SECTIONS
-    setTimeout(() => {
-      wait_scroll = false
-    }, wait_time)
-  }
-
-  function selectPages (e) {
-    // CHECK IF THERE IS ANY SECTIONS CREATED
-    if (!sections && sections.length <= 0) { return }
-
-    // IF WAITING FOR ANIMATION (PAGE SWITCH) TO COMPLETE - RETURN, BEFORE SWICHING NEXT PAGE
-    if (wait_page) {
-      return
-    } else {
-      wait_page = true
-    }
-
-    // GET ALL PAGES IN CURRENT SECTION
-    const pages = sections[current_section].getElementsByClassName('page')
-
-    // DETECT SWIPE-LEFT AND PREVENT FROM CHANGING DIRECTION (UP OR DOWN) WHILE DRAGGING
-    if (e === 'left' && swiping_direction !== 'right' && current_page_per_section[current_section] < pages.length - 1) {
-      current_page_per_section[current_section]++
-      translate_pages[current_section] -= width
-    }
-
-    // DETECT SWIPE-RIGHT AND PREVENT FROM CHANGING DIRECTION (UP OR DOWN) WHILE DRAGGING
-    if (e === 'right' && swiping_direction !== 'left' && current_page_per_section[current_section] > 0) {
-      current_page_per_section[current_section]--
-      translate_pages[current_section] += width
-    }
-
-    // DETECT CLICK FROM NAVIGATION (BUTTON)
-    if (e.type === 'click') {
-      const click = parseInt(e.target.value) - current_page_per_section[current_section]
-      current_page_per_section[current_section] = parseInt(e.target.value)
-      translate_pages[current_section] = translate_pages[current_section] - (width * click)
-    } else {
-      // RESTORE SECTION POSITION, JUST IN CASE - IF THERE WAS DRAGGING LEFT OR RIGHT, BUT CHANGED DIRECTION (TO UP OR DOWN - CANCELED)
-      translate_pages[current_section] = Math.round(translate_pages[current_section] / 100) * 100
-    }
-
     // MOVING/DRAGGING ENDED SO RESTORE SETTINGS
-    moving = false
-    width = 100
-
-    // SHOW ACTIVE NAVIGATION BUTTON - WHICH PAGE IS SELECTED (DISPLAYED)
-    const button = document.getElementById(`page[${current_section}][${current_page_per_section[current_section]}]`)
-    button.checked = true
-
+    this.isDragging = false
+    this.height = 100
+    
     // THE MAIN PART - UPDATE AND SWITCH SECTIONS (ANIMATE VIA CSS)
-    for (let index = 0; index < pages.length; index++) {
-      pages[index].style.transform = `translateX(${translate_pages[current_section]}%)`
+    for (let index = 0; index < this.sections.length; index++) {
+      this.sections[index].style.transform = `translateY(${this.translate.section}%)`
     }
 
-    // LET PREVIOUS ANIMATION COMPLETE BEFORE SWITCHING SECTIONS
     setTimeout(() => {
-      wait_page = false
-    }, wait_time)
+      this.waitAnimation = false
+    }, this.timeToAnimate)
+
   }
 
-  /// ////////////////////////////////////////////////////
-  /// / HANDLING DRAGGING/MOVING EFFECT BEFORE SWIPE /////
-  /// ////////////////////////////////////////////////////
 
-  function swipeMove (e) {
-    // IF THERE WAS NO STARTED MOVEMENT/DRAGGING - RETURN
-    if (!moving) {
+  switchAndTranslatePage (swipeOrClick) {
+
+
+    if (swipeOrClick === 'left' && this.swipeStartDirection !== 'right' && (this.currentPage[this.currentSection] < this.pagesPerSection[this.currentSection].length - 1)) {
+      this.currentPage[this.currentSection]++
+      this.translate.page[this.currentSection] -= this.width
+    } else if (swipeOrClick === 'right' && this.swipeStartDirection !== 'left' && (this.currentPage[this.currentSection] > 0)) {
+      this.currentPage[this.currentSection]--
+      this.translate.page[this.currentSection] += this.width
+    } else if (swipeOrClick.type === 'click') {
+      console.log(this.currentPage[this.currentSection])
+      const getDirectionFromClick = parseInt(swipeOrClick.target.value) - this.currentPage[this.currentSection]
+      this.currentPage[this.currentSection] = parseInt(swipeOrClick.target.value)
+      this.translate.page[this.currentSection] = this.translate.page[this.currentSection] - (this.width * getDirectionFromClick)
+    } else {
+      this.translate.page[this.currentSection] = Math.round(this.translate.page[this.currentSection] / 100) * 100
+    }
+
+
+    this.isDragging = false
+    this.width = 100
+    
+    // SHOW ACTIVE NAVIGATION BUTTON - WHICH PAGE IS SELECTED (DISPLAYED)
+    const button = document.getElementById(`page[${this.currentSection}][${this.currentPage[this.currentSection]}]`)
+    if (button) {
+      button.checked = true
+    }
+    
+    
+    // THE MAIN PART - UPDATE AND SWITCH SECTIONS (ANIMATE VIA CSS)
+    for (let index = 0; index < this.pagesPerSection[this.currentSection].length; index++) {
+      this.pagesPerSection[this.currentSection][index].style.transform = `translateX(${this.translate.page[this.currentSection]}%)`
+    }
+    
+    // LET PREVIOUS ANIMATION COMPLETE BEFORE SWITCHING SECTIONS
+    setTimeout(() => {
+      this.waitAnimation = false
+    }, this.timeToAnimate)
+
+
+  }
+
+  draggingEffect () {
+
+
+    if (!this.isDragging) {
       return
     }
 
     // SAVE SWIPING DIRECTION TO COMPARE AFTER SWIPE IS COMPLETED/ENDED
     // [AS THIS FUNCTION IS UPDATED ONLY ONCE PER DRAG]
-    swiping_direction = swiping
+    this.swipeStartDirection = this.swipeEndDirection
 
     // CHECK IF SWIPING LEFT OR RIGHT AND WE AREN'T WAITING FOR PREVIOUS ANIMATION TO COMPLETE
-    if ((swiping === 'left' || swiping === 'right') && !wait_page) {
-      // GET PAGE LIST FOR CURRENT SECTION (PAGES THAT BELONG TO CURRENT SECTION)
-      const pages = sections[current_section].getElementsByClassName('page')
+    if ((this.swipeStartDirection === 'left' || this.swipeStartDirection === 'right') && !this.waitAnimation) {
+
+      const pages = this.pagesPerSection[this.currentSection]
 
       // UPDATE TRANSLATE DIMENSIONS IF DRAGGING LEFT
-      if (swiping === 'left') {
-        width -= percent
-        translate_pages[current_section] -= percent
+      if (this.swipeStartDirection === 'left') {
+        this.width -= this.draggingPercent
+        this.translate.page[this.currentSection] -= this.draggingPercent
       }
 
       // UPDATE TRANSLATE DIMENSIONS IF DRAGGING RIGHT
-      if (swiping === 'right') {
-        width -= percent
-        translate_pages[current_section] += percent
+      if (this.swipeStartDirection === 'right') {
+        this.width -= this.draggingPercent
+        this.translate.page[this.currentSection] += this.draggingPercent
       }
 
       // ANIMATE SECTIONS IF DRAGGING LEFT OR RIGHT
       for (let index = 0; index < pages.length; index++) {
-        pages[index].style.transform = `translateX(${translate_pages[current_section]}%)`
+        pages[index].style.transform = `translateX(${this.translate.page[this.currentSection]}%)`
       }
     }
 
     // CHECK IF SWIPING UP OR DOWN AND WE AREN'T WAITING FOR PREVIOUS ANIMATION TO COMPLETE
-    if ((swiping === 'up' || swiping === 'down') && !wait_scroll) {
+    if ((this.swipeStartDirection === 'up' || this.swipeStartDirection === 'down') && !this.waitAnimation) {
       // UPDATE TRANSLATE DIMENSIONS IF DRAGGING UP
-      if (swiping === 'up') {
-        height -= percent
-        translateY_section -= percent
+      if (this.swipeStartDirection === 'up') {
+        this.height -= this.draggingPercent
+        this.translate.section -= this.draggingPercent
       }
 
       // UPDATE TRANSLATE DIMENSIONS IF DRAGGING DOWN
-      if (swiping === 'down') {
-        height -= percent
-        translateY_section += percent
+      if (this.swipeStartDirection === 'down') {
+        this.height -= this.draggingPercent
+        this.translate.section += this.draggingPercent
       }
 
       // ANIMATE SECTIONS IF DRAGGING UP OR DOWN
-      for (let index = 0; index < sections.length; index++) {
-        sections[index].style.transform = `translateY(${translateY_section}%)`
+      for (let index = 0; index < this.sections.length; index++) {
+        this.sections[index].style.transform = `translateY(${this.translate.section}%)`
       }
     }
 
     // WE HAVE DONE ALL THE STUFF - DON'T DO ANYTHING
-    moving = false
+    this.isDragging = false
+
   }
 
-  /// EVENT LISTENERS AND HANDLING SWIPES ///
-
-  // SETUP EVENT LISTENERS
-  window.onwheel = scrollSections
-  window.onmousedown = handleTouchStart
-  window.onmousemove = handleTouchMove
-  window.onmouseup = handleTouchEnd
-  window.ontouchstart = handleTouchStart
-  window.ontouchmove = handleTouchMove
-  window.ontouchend = handleTouchEnd
-
-  // SETUP VARIABLES NEEDED TO HANDLE SWIPES
-  var first_touch_y = null
-  var first_touch_x = null
-  var last_touch_x = null
-  var last_touch_y = null
-
-  // DETECT MOBILE OR DESKTOP SWIPE
-  function getTouches (event) {
+  getTouchOrClick (event) {
     const touch = event.touches ? event.touches[0] : event
     return touch
   }
 
-  // GET THE FIRST TOUCH POSITION
-  function handleTouchStart (event) {
-    swiping = null // SET TO NULL IF THERE WAS PREVIUS SWIPING
-    moving = true // TO ACTIVATE swipeMove() MOVING FUNCTION
+  touchStart (event) {
+    this.isDragging = true 
 
     // GET THE FIRST TOUCH  POSITION
-    first_touch_x = getTouches(event).clientX
-    first_touch_y = getTouches(event).clientY
+    this.touches.startX = this.getTouchOrClick(event).clientX
+    this.touches.startY = this.getTouchOrClick(event).clientY
   }
 
-  // GET THE LAST TOUCH POSITION AND CALCULATE SWIPE DIRECTION
-  function handleTouchMove (event) {
+  touchMove (event) {
     // IF THERE WASN'T A REGISTRED FIRST TOUCH THEN RETURN (WEIRD, huh?)
-    if (!first_touch_x || !first_touch_y) { return }
+    if (!this.touches.startX || !this.touches.startY) { 
+      return
+    }
+
+    
 
     // SET/UPDATE LAST TOUCH POSITION
-    last_touch_x = getTouches(event).clientX
-    last_touch_y = getTouches(event).clientY
+    this.touches.endX = this.getTouchOrClick(event).clientX
+    this.touches.endY = this.getTouchOrClick(event).clientY
 
     // CALCULATE DIFFERENCE BETWEEN FIRST AND LAST POSITION
-    const xDiff = first_touch_x - last_touch_x
-    const yDiff = first_touch_y - last_touch_y
+    this.touches.differenceX = this.touches.startX - this.touches.endX
+    this.touches.differenceY = this.touches.startY - this.touches.endY
 
-    // IF SWIPED LEFT/RIGHT
-    if (Math.abs(xDiff) > Math.abs(yDiff)) {
-      swiping = xDiff > 0 ? 'left' : 'right'
+    // We need to know vertical or horizontal swipe accured and then left/right or up/down
+    if (Math.abs(this.touches.differenceX) > Math.abs(this.touches.differenceY)) {
+      this.swipeEndDirection = this.touches.differenceX > 0 ? 'left' : 'right'
     } else {
-      swiping = yDiff > 0 ? 'up' : 'down'
+      this.swipeEndDirection = this.touches.differenceY > 0 ? 'up' : 'down'
     }
 
     // ACTIVATE ACTUAL FUNCTION TO ANIMATION DRAGGING
-    swipeMove()
+    this.draggingEffect()
+   
   }
 
-  // AFTER SWIPE IS ENDED [TOUCH / CLICK RELEASED] HANDLE ACTUAL SWIPING
-  function handleTouchEnd () {
-    // CHECK IF SWIPING/DRAGGING ACCURED - NOT CLICKED/PRESSED
-    if (swiping) {
-      // SEND INFORMATION ABOUT SWIPE TO BOTH HANDLERS [SECTION AND PAGE]
-      // BECAUSE THEY "KNOW" WHAT TO DO WHEN SWIPE WAS FOR THEM OR NOT
+  touchEnd () {
 
-      scrollSections(swiping) // SECTION HANDLER
-      selectPages(swiping) // PAGES HANDLER
+    if (this.swipeEndDirection) {   
+      this.switchAndTranslatePage(this.swipeEndDirection)
+      this.switchAndTranslateSection(this.swipeEndDirection)
     }
 
     // RESET SETTINGS AFTER SWIPE IS COMPLETED/ENDED
-    first_touch_x = null
-    first_touch_y = null
-    swiping = null
-    moving = false
+    this.isDragging = false
+
+    this.touches.startX = null
+    this.touches.startY = null
+  
+    this.swipeStartDirection = null
+    this.swipeEndDirection = null
+      
+  }
+  
+
+  createElement (tag, options, parent) {
+    try {
+      const getParent = (typeof parent) === 'object' ? parent : document.getElementById(parent)
+      const createElement = document.createElement(tag)
+      
+      for (const key in options) {
+
+        if (key === 'style') {
+
+          for (const style in options[key]) {
+            createElement.style[style] = options[key][style]
+          }
+
+        } else if (key === 'onclick') {
+         
+          createElement.addEventListener('click', options[key])
+          
+        } else {
+          createElement[key] = options[key]
+        }
+
+      }
+      
+      getParent.appendChild(createElement)
+      return createElement
+      
+    } catch (error) {
+      this.handleError('Unable to create buttons', error)
+    }
+  }
+
+  setupEventListeners () {
+    window.onwheel = this.switchAndTranslateSection.bind(this)
+    window.onmousedown = this.touchStart.bind(this)
+    window.onmousemove = this.touchMove.bind(this)
+    window.onmouseup = this.touchEnd.bind(this)
+    window.ontouchstart = this.touchStart.bind(this)
+    window.ontouchmove = this.touchMove.bind(this)
+    window.ontouchend = this.touchEnd.bind(this)
+  }
+
+
+  handleError (string, error) {
+    console.warn(`${string}: `, error)
   }
 }
