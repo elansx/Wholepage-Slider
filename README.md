@@ -60,7 +60,7 @@ Copy and paste this in your html file
     <script src="https://cdn.jsdelivr.net/gh/elansx/Slider/slider.js"></script>
     <script>
         new WholePageSlider("wholepage", {
-            colors: ['lightskyblue', 'orange']
+            colors: ['deepskyblue', 'orange']
         })
     </script>
 
@@ -69,6 +69,4 @@ Copy and paste this in your html file
 ```
 ## License
 
-MIT License
-
-Copyright (c) 2020 elansx
+MIT License Copyright (c) 2020 elansx
