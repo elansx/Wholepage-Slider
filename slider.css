@@ -26,7 +26,7 @@ p {
     font-size: calc(1em + 0.5vw);
 }
 
-#page {
+#wholepage {
     display: block;
     width: 100%;
     height: 100%;
@@ -59,7 +59,7 @@ section {
     transition: transform 0.4s ease-out;
 }
 
-.section_selection {
+.sectionButtonContainer {
     position: fixed;
     display: flex;
     flex-direction: column;
@@ -70,20 +70,20 @@ section {
 
 }
 
-.section_selection label, .page_selection label {
+.sectionButtonContainer label, .page_selection label {
     display: inline-flex;
     width: 4px;
     height: 4px;
     border-radius: 50%;
     background: rgb(255, 255, 255, 0.8);
     transition: transform 0.2s;
-    margin: 12px 8px;
+    margin: 12px 12px;
     padding: 0px;
     box-shadow: 0px 0px 8px rgba(0, 27, 160, 0.8);
     cursor: pointer;
 }
 
-.section_selection label::after, .page_selection label::after {
+.sectionButtonContainer label::after, .page_selection label::after {
     content: '';
     display: inline-flex;
     position: relative;
@@ -92,12 +92,12 @@ section {
     padding: 10px;
 }
 
-.section_selection input[type=radio]:checked + label::after, .page_selection input[type=radio]:checked + label::after {
+.sectionButtonContainer input[type=radio]:checked + label::after, .page_selection input[type=radio]:checked + label::after {
    display: none;
 }
 
 
-.section_selection input[type=radio]:checked + label, .page_selection input[type=radio]:checked + label  {
+.sectionButtonContainer input[type=radio]:checked + label, .page_selection input[type=radio]:checked + label  {
     transform: scale(2.2);
     transition: transform 0.2s;
 }
@@ -113,4 +113,5 @@ section {
     color: rgb(30, 30, 30);
     -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
     z-index: 999999; 
+
 }
