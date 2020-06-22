@@ -1,3 +1,7 @@
+/* eslint-disable no-trailing-spaces */
+/* eslint-disable padded-blocks */
+/* eslint-disable no-multiple-empty-lines */
+// eslint-disable-next-line no-unused-vars
 const WholePageSlider = class {
   constructor (containerId, options) {
     this.container = document.getElementById(containerId)
@@ -141,14 +145,14 @@ const WholePageSlider = class {
 
   
     
-    // SHOW ACTIVE BUTTON - WHICH SECTION IS SELECTED (DISPLAYED)
+    // This is needed to show active page on navigation buttons
     const button = document.getElementById(`sectionId[${this.currentSection}]`)
     button.checked = true
-    // MOVING/DRAGGING ENDED SO RESTORE SETTINGS
+ 
     this.isDragging = false
     this.height = 100
     
-    // THE MAIN PART - UPDATE AND SWITCH SECTIONS (ANIMATE VIA CSS)
+
     for (let index = 0; index < this.sections.length; index++) {
       this.sections[index].style.transform = `translateY(${this.translate.section}%)`
     }
@@ -182,19 +186,18 @@ const WholePageSlider = class {
     this.isDragging = false
     this.width = 100
     
-    // SHOW ACTIVE NAVIGATION BUTTON - WHICH PAGE IS SELECTED (DISPLAYED)
+    // This is needed to show active page on navigation buttons
     const button = document.getElementById(`page[${this.currentSection}][${this.currentPage[this.currentSection]}]`)
     if (button) {
       button.checked = true
     }
     
-    
-    // THE MAIN PART - UPDATE AND SWITCH SECTIONS (ANIMATE VIA CSS)
+
     for (let index = 0; index < this.pagesPerSection[this.currentSection].length; index++) {
       this.pagesPerSection[this.currentSection][index].style.transform = `translateX(${this.translate.page[this.currentSection]}%)`
     }
     
-    // LET PREVIOUS ANIMATION COMPLETE BEFORE SWITCHING SECTIONS
+  
     setTimeout(() => {
       this.waitAnimation = false
     }, this.timeToAnimate)
@@ -209,54 +212,45 @@ const WholePageSlider = class {
       return
     }
 
-    // SAVE SWIPING DIRECTION TO COMPARE AFTER SWIPE IS COMPLETED/ENDED
-    // [AS THIS FUNCTION IS UPDATED ONLY ONCE PER DRAG]
+    // Save start swiping direction to compare when touch/click ended
     this.swipeStartDirection = this.swipeEndDirection
 
-    // CHECK IF SWIPING LEFT OR RIGHT AND WE AREN'T WAITING FOR PREVIOUS ANIMATION TO COMPLETE
+
     if ((this.swipeStartDirection === 'left' || this.swipeStartDirection === 'right') && !this.waitAnimation) {
 
       const pages = this.pagesPerSection[this.currentSection]
 
-      // UPDATE TRANSLATE DIMENSIONS IF DRAGGING LEFT
       if (this.swipeStartDirection === 'left') {
         this.width -= this.draggingPercent
         this.translate.page[this.currentSection] -= this.draggingPercent
-      }
-
-      // UPDATE TRANSLATE DIMENSIONS IF DRAGGING RIGHT
+      } else
       if (this.swipeStartDirection === 'right') {
         this.width -= this.draggingPercent
         this.translate.page[this.currentSection] += this.draggingPercent
       }
 
-      // ANIMATE SECTIONS IF DRAGGING LEFT OR RIGHT
       for (let index = 0; index < pages.length; index++) {
         pages[index].style.transform = `translateX(${this.translate.page[this.currentSection]}%)`
       }
+
     }
 
-    // CHECK IF SWIPING UP OR DOWN AND WE AREN'T WAITING FOR PREVIOUS ANIMATION TO COMPLETE
     if ((this.swipeStartDirection === 'up' || this.swipeStartDirection === 'down') && !this.waitAnimation) {
-      // UPDATE TRANSLATE DIMENSIONS IF DRAGGING UP
+     
       if (this.swipeStartDirection === 'up') {
         this.height -= this.draggingPercent
         this.translate.section -= this.draggingPercent
-      }
-
-      // UPDATE TRANSLATE DIMENSIONS IF DRAGGING DOWN
+      } else
       if (this.swipeStartDirection === 'down') {
         this.height -= this.draggingPercent
         this.translate.section += this.draggingPercent
       }
 
-      // ANIMATE SECTIONS IF DRAGGING UP OR DOWN
       for (let index = 0; index < this.sections.length; index++) {
         this.sections[index].style.transform = `translateY(${this.translate.section}%)`
       }
     }
 
-    // WE HAVE DONE ALL THE STUFF - DON'T DO ANYTHING
     this.isDragging = false
 
   }
@@ -268,25 +262,19 @@ const WholePageSlider = class {
 
   touchStart (event) {
     this.isDragging = true 
-
-    // GET THE FIRST TOUCH  POSITION
     this.touches.startX = this.getTouchOrClick(event).clientX
     this.touches.startY = this.getTouchOrClick(event).clientY
   }
 
   touchMove (event) {
-    // IF THERE WASN'T A REGISTRED FIRST TOUCH THEN RETURN (WEIRD, huh?)
+
     if (!this.touches.startX || !this.touches.startY) { 
       return
     }
 
-    
-
-    // SET/UPDATE LAST TOUCH POSITION
     this.touches.endX = this.getTouchOrClick(event).clientX
     this.touches.endY = this.getTouchOrClick(event).clientY
 
-    // CALCULATE DIFFERENCE BETWEEN FIRST AND LAST POSITION
     this.touches.differenceX = this.touches.startX - this.touches.endX
     this.touches.differenceY = this.touches.startY - this.touches.endY
 
@@ -297,7 +285,7 @@ const WholePageSlider = class {
       this.swipeEndDirection = this.touches.differenceY > 0 ? 'up' : 'down'
     }
 
-    // ACTIVATE ACTUAL FUNCTION TO ANIMATION DRAGGING
+  
     this.draggingEffect()
    
   }
@@ -309,12 +297,9 @@ const WholePageSlider = class {
       this.switchAndTranslateSection(this.swipeEndDirection)
     }
 
-    // RESET SETTINGS AFTER SWIPE IS COMPLETED/ENDED
     this.isDragging = false
-
     this.touches.startX = null
     this.touches.startY = null
-  
     this.swipeStartDirection = null
     this.swipeEndDirection = null
       
