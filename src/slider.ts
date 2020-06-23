@@ -1,4 +1,4 @@
-const WholePageSlider = class {
+export default class WholePageSlider {
   constructor (containerId, options) {
     this.container = document.getElementById(containerId)
     this.sections = document.getElementsByTagName('section')
