@@ -1,19 +1,20 @@
+import './slider.scss';
 import { Options, Directions, Translate, Touches } from './types';
 
 export default class WholePageSlider {
-  private container: HTMLElement;
-  private sections: HTMLCollectionOf<HTMLElement>;
-  private pagesPerSection: HTMLCollectionOf<HTMLElement>[] = [];
-  private currentPage: number[] = [];
-  private currentSection: number = 0;
-  private isDragging: boolean = false;
-  private draggingPercent: number = 20;
-  private waitAnimation: boolean = false;
-  private timeToAnimate: number = 300;
-  private height: number = 100;
-  private width: number = 100;
-  private swipeStartDirection: Directions = null;
-  private swipeEndDirection: Directions = null;
+  private container: HTMLElement
+  private sections: HTMLCollectionOf<HTMLElement>
+  private pagesPerSection: HTMLCollectionOf<HTMLElement>[] = []
+  private currentPage: number[] = []
+  private currentSection: number = 0
+  private isDragging: boolean = false
+  private draggingPercent: number = 20
+  private waitAnimation: boolean = false
+  private timeToAnimate: number = 300
+  private height: number = 100
+  private width: number = 100
+  private swipeStartDirection: Directions = null
+  private swipeEndDirection: Directions = null
   private translate: Translate = {
     section: 0,
     page: []
