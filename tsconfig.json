@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+      "baseUrl": "./src",
+      "esModuleInterop": true,
+      "noImplicitAny": false,
+      "paths": {
+        "~*": ["./*"]
+      },
+      "typeRoots": ["node_modules/@types"]
+    },
+    "include": ["src/**/*"]
+  }

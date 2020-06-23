@@ -1,45 +1,39 @@
-const WholePageSlider = class {
-  constructor (containerId, options) {
+import './slider.scss';
+import { Options, Directions, Translate, Touches } from './types';
+
+export default class WholePageSlider {
+  private container: HTMLElement
+  private sections: HTMLCollectionOf<HTMLElement>
+  private pagesPerSection: HTMLCollectionOf<HTMLElement>[] = []
+  private currentPage: number[] = []
+  private currentSection: number = 0
+  private isDragging: boolean = false
+  private draggingPercent: number = 20
+  private waitAnimation: boolean = false
+  private timeToAnimate: number = 300
+  private height: number = 100
+  private width: number = 100
+  private swipeStartDirection: Directions = null
+  private swipeEndDirection: Directions = null
+  private translate: Translate = {
+    section: 0,
+    page: []
+  }
+  private touches: Touches = {
+    startX: null,
+    startY: null,
+    endX: null,
+    endY: null,
+    differenceX: null,
+    differenceY: null
+  }
+
+  constructor (containerId: string, readonly options: Options = {}) {
     this.container = document.getElementById(containerId)
     this.sections = document.getElementsByTagName('section')
-
-    this.pagesPerSection = []
-    this.currentPage = []
-    this.currentSection = 0
-
-    this.isDragging = false
-    this.draggingPercent = 20
-
-    this.waitAnimation = false
-    this.timeToAnimate = 300
-    
-    this.height = 100
-    this.width = 100
-
-    this.swipeStartDirection = null
-    this.swipeEndDirection = null
-    
-    this.options = {
-      ...options
-    }
-    this.translate = {
-      section: 0,
-      page: []
-    }
-    
-    this.touches = {
-      startX: null,
-      startY: null,
-      endX: null,
-      endY: null,
-      differenceX: null,
-      differenceY: null
-    }
     
     this.init()
     this.setupEventListeners()
-
-
   }
 
   init () {
@@ -52,7 +46,7 @@ const WholePageSlider = class {
       this.translate.page[index] = 0
       this.currentPage[index] = 0
       this.sections[index].style.background = this.options.colors ? this.options.colors[index] : 'white'
-      this.pagesPerSection[index] = this.sections[index].getElementsByClassName('page')
+      this.pagesPerSection[index] = (this.sections[index].getElementsByClassName('page') as HTMLCollectionOf<HTMLElement>)
 
       // We need to be sure that there is more then 1 section before creating navigation
       if (this.sections.length > 1) {
@@ -140,7 +134,7 @@ const WholePageSlider = class {
     // This is needed to show active page on navigation buttons
     const button = document.getElementById(`sectionId[${this.currentSection}]`)
     if (button) {
-      button.checked = true
+      (button as any).checked = true
     }
    
     // Reset settings after swipe, drag or click ended
@@ -188,7 +182,7 @@ const WholePageSlider = class {
     // This is needed to show active page on navigation buttons
     const button = document.getElementById(`page[${this.currentSection}][${this.currentPage[this.currentSection]}]`)
     if (button) {
-      button.checked = true
+      (button as any).checked = true
     }
     
     // Animate/translate pages
