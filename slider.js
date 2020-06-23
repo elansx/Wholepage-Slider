@@ -48,30 +48,34 @@ const WholePageSlider = class {
 
     // Create elements for every section and apply styles
     for (let index = 0; index < this.sections.length; index++) {
+
       this.translate.page[index] = 0
       this.currentPage[index] = 0
       this.sections[index].style.background = this.options.colors ? this.options.colors[index] : 'white'
       this.pagesPerSection[index] = this.sections[index].getElementsByClassName('page')
 
+      // We need to be sure what there is more then one section before creating navigation
+      if (this.sections.length > 1) {
 
-      const sectionNavigationButton = this.createElement('input', {
-        type: 'radio',
-        name: 'sectionScrollButton',
-        id: `sectionId[${index}]`,
-        value: index,
-        onclick: this.switchAndTranslateSection.bind(this),
-        checked: this.currentSection === index,
-        style: {
-          display: 'none'
-        }
-      }, sectionButtonContainer)
+        const sectionNavigationButton = this.createElement('input', {
+          type: 'radio',
+          name: 'sectionScrollButton',
+          id: `sectionId[${index}]`,
+          value: index,
+          onclick: this.switchAndTranslateSection.bind(this),
+          checked: this.currentSection === index,
+          style: {
+            display: 'none'
+          }
+        }, sectionButtonContainer)
 
-      this.createElement('label', { htmlFor: sectionNavigationButton.id }, sectionButtonContainer)
+        this.createElement('label', { htmlFor: sectionNavigationButton.id }, sectionButtonContainer)
+        
+      }
 
-
+      // Create navigation for pages only if there is more than 1 page per section
       if (this.pagesPerSection[index].length > 1) {
         
-        // We need a container where to store our navigation buttons for pages
         const buttonContainer = this.createElement('div', { id: `pageButtonContainer[${index}]`, className: 'page_selection' }, this.sections[index])
 
         for (let i = 0; i < this.pagesPerSection[index].length; i++) {
@@ -95,10 +99,16 @@ const WholePageSlider = class {
         }
 
         buttonContainer.style.left = `calc(50% - ${buttonContainer.getBoundingClientRect().width / 2}px)`
-        sectionButtonContainer.style.top = `calc(50% - ${sectionButtonContainer.getBoundingClientRect().height / 2}px)`
+     
+        
 
       }
     }
+
+    if (sectionButtonContainer) {
+      sectionButtonContainer.style.top = `calc(50% - ${sectionButtonContainer.getBoundingClientRect().height / 2}px)`
+    }
+
   }
 
  
@@ -114,15 +124,12 @@ const WholePageSlider = class {
     if (((swipeOrClick.deltaY > 0 || swipeOrClick === 'up') && this.swipeStartDirection !== 'down') && (this.currentSection < this.sections.length - 1)) {
       this.currentSection++
       this.translate.section -= this.height
-      console.log('up')
     } else
     if (((swipeOrClick.deltaY < 0 || swipeOrClick === 'down') && this.swipeStartDirection !== 'up') && (this.currentSection > 0)) {
       this.currentSection--
       this.translate.section += this.height
-      console.log('down')
     } else  
     if (swipeOrClick.type === 'click') {
-      console.log('click')
       const click = parseInt(swipeOrClick.target.value) - this.currentSection
       this.currentSection = parseInt(swipeOrClick.target.value)
       this.translate.section = this.translate.section - (this.height * click)
@@ -132,7 +139,10 @@ const WholePageSlider = class {
 
     // This is needed to show active page on navigation buttons
     const button = document.getElementById(`sectionId[${this.currentSection}]`)
-    button.checked = true
+    if (button) {
+      button.checked = true
+    }
+   
 
     this.isDragging = false
     this.height = 100
@@ -160,7 +170,6 @@ const WholePageSlider = class {
       this.translate.page[this.currentSection] += this.width
     } else
     if (swipeOrClick.type === 'click') {
-      console.log(this.currentPage[this.currentSection])
       const getDirectionFromClick = parseInt(swipeOrClick.target.value) - this.currentPage[this.currentSection]
       this.currentPage[this.currentSection] = parseInt(swipeOrClick.target.value)
       this.translate.page[this.currentSection] = this.translate.page[this.currentSection] - (this.width * getDirectionFromClick)
