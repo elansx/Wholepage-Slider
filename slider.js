@@ -54,9 +54,10 @@ const WholePageSlider = class {
       this.sections[index].style.background = this.options.colors ? this.options.colors[index] : 'white'
       this.pagesPerSection[index] = this.sections[index].getElementsByClassName('page')
 
-      // We need to be sure what there is more then one section before creating navigation
+      // We need to be sure that there is more then 1 section before creating navigation
       if (this.sections.length > 1) {
 
+        // Create radio button for every section
         const sectionNavigationButton = this.createElement('input', {
           type: 'radio',
           name: 'sectionScrollButton',
@@ -69,9 +70,11 @@ const WholePageSlider = class {
           }
         }, sectionButtonContainer)
 
+        // Give some custom style for radio buttons with labels
         this.createElement('label', { htmlFor: sectionNavigationButton.id }, sectionButtonContainer)
         
       }
+
 
       // Create navigation for pages only if there is more than 1 page per section
       if (this.pagesPerSection[index].length > 1) {
@@ -80,6 +83,7 @@ const WholePageSlider = class {
 
         for (let i = 0; i < this.pagesPerSection[index].length; i++) {
 
+          // Create radio button for every page
           this.createElement('input', {
             type: 'radio',
             id: `page[${index}][${i}]`,
@@ -92,9 +96,8 @@ const WholePageSlider = class {
             }
           }, buttonContainer)
 
-          this.createElement('label', {
-            htmlFor: `page[${index}][${i}]`
-          }, buttonContainer)
+          // Give some custom style for radio buttons with labels
+          this.createElement('label', { htmlFor: `page[${index}][${i}]` }, buttonContainer)
 
         }
 
@@ -109,12 +112,14 @@ const WholePageSlider = class {
 
   switchAndTranslateSection (swipeOrClick) {
    
+    // If we have no sections created or have to wait for animation to complete - return
     if (!this.sections || this.sections.length < 1 || this.waitAnimation) {
       return
     } else {
       this.waitAnimation = true
     }
 
+    // Handle swipe or click for sections (UP/DOWN)
     if (((swipeOrClick.deltaY > 0 || swipeOrClick === 'up') && this.swipeStartDirection !== 'down') && (this.currentSection < this.sections.length - 1)) {
       this.currentSection++
       this.translate.section -= this.height
@@ -128,6 +133,7 @@ const WholePageSlider = class {
       this.currentSection = parseInt(swipeOrClick.target.value)
       this.translate.section = this.translate.section - (this.height * click)
     } else {
+      // Now, if there was any dragging, but canceled – animate back to origin.
       this.translate.section = Math.round(this.translate.section / 100) * 100
     }
 
@@ -137,15 +143,17 @@ const WholePageSlider = class {
       button.checked = true
     }
    
-
+    // Reset settings after swipe, drag or click ended
     this.isDragging = false
     this.height = 100
     
 
+    // Animate/translate sections
     for (let index = 0; index < this.sections.length; index++) {
       this.sections[index].style.transform = `translateY(${this.translate.section}%)`
     }
 
+    // Complete previous animation before calling next
     setTimeout(() => {
       this.waitAnimation = false
     }, this.timeToAnimate)
@@ -155,6 +163,7 @@ const WholePageSlider = class {
 
   switchAndTranslatePage (swipeOrClick) {
 
+    // Handle swipe or click for pages (LEFT/RIGHT)
     if (swipeOrClick === 'left' && this.swipeStartDirection !== 'right' && (this.currentPage[this.currentSection] < this.pagesPerSection[this.currentSection].length - 1)) {
       this.currentPage[this.currentSection]++
       this.translate.page[this.currentSection] -= this.width
@@ -168,9 +177,11 @@ const WholePageSlider = class {
       this.currentPage[this.currentSection] = parseInt(swipeOrClick.target.value)
       this.translate.page[this.currentSection] = this.translate.page[this.currentSection] - (this.width * getDirectionFromClick)
     } else {
+      // Now, if there was any dragging, but canceled – animate back to origin.
       this.translate.page[this.currentSection] = Math.round(this.translate.page[this.currentSection] / 100) * 100
     }
 
+    // Reset settings after swipe, drag or click ended
     this.isDragging = false
     this.width = 100
     
@@ -180,10 +191,12 @@ const WholePageSlider = class {
       button.checked = true
     }
     
+    // Animate/translate pages
     for (let index = 0; index < this.pagesPerSection[this.currentSection].length; index++) {
       this.pagesPerSection[this.currentSection][index].style.transform = `translateX(${this.translate.page[this.currentSection]}%)`
     }
-    
+
+    // Complete previous animation before calling next
     setTimeout(() => {
       this.waitAnimation = false
     }, this.timeToAnimate)
@@ -199,8 +212,10 @@ const WholePageSlider = class {
     // Save start swiping direction to compare when touch/click ended
     this.swipeStartDirection = this.swipeEndDirection
 
+    // Check if dragging horizontal and we are not waiting for any previous animation to complete
     if ((this.swipeStartDirection === 'left' || this.swipeStartDirection === 'right') && !this.waitAnimation) {
 
+      // Get all pages for current section
       const pages = this.pagesPerSection[this.currentSection]
 
       if (this.swipeStartDirection === 'left') {
@@ -212,12 +227,13 @@ const WholePageSlider = class {
         this.translate.page[this.currentSection] += this.draggingPercent
       }
 
+      // Animate horizontal drag effect
       for (let index = 0; index < pages.length; index++) {
         pages[index].style.transform = `translateX(${this.translate.page[this.currentSection]}%)`
       }
-
     }
 
+    // Check if dragging veritcal and we are not waiting for any previous animation to complete
     if ((this.swipeStartDirection === 'up' || this.swipeStartDirection === 'down') && !this.waitAnimation) {
      
       if (this.swipeStartDirection === 'up') {
@@ -229,21 +245,22 @@ const WholePageSlider = class {
         this.translate.section += this.draggingPercent
       }
 
+      // Animate vertical drag effect
       for (let index = 0; index < this.sections.length; index++) {
         this.sections[index].style.transform = `translateY(${this.translate.section}%)`
       }
     }
 
+    // Function completed - we are not dragging anymore
     this.isDragging = false
   }
 
 
-
+  // Check if it is Mobile or Desktop device
   getTouchOrClick (event) {
     const touch = event.touches ? event.touches[0] : event
     return touch
   }
-
 
 
   touchStart (event) {
