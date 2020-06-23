@@ -154,10 +154,12 @@ const WholePageSlider = class {
     if (swipeOrClick === 'left' && this.swipeStartDirection !== 'right' && (this.currentPage[this.currentSection] < this.pagesPerSection[this.currentSection].length - 1)) {
       this.currentPage[this.currentSection]++
       this.translate.page[this.currentSection] -= this.width
-    } else if (swipeOrClick === 'right' && this.swipeStartDirection !== 'left' && (this.currentPage[this.currentSection] > 0)) {
+    } else
+    if (swipeOrClick === 'right' && this.swipeStartDirection !== 'left' && (this.currentPage[this.currentSection] > 0)) {
       this.currentPage[this.currentSection]--
       this.translate.page[this.currentSection] += this.width
-    } else if (swipeOrClick.type === 'click') {
+    } else
+    if (swipeOrClick.type === 'click') {
       console.log(this.currentPage[this.currentSection])
       const getDirectionFromClick = parseInt(swipeOrClick.target.value) - this.currentPage[this.currentSection]
       this.currentPage[this.currentSection] = parseInt(swipeOrClick.target.value)
