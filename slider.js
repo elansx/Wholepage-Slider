@@ -99,16 +99,10 @@ const WholePageSlider = class {
         }
 
         buttonContainer.style.left = `calc(50% - ${buttonContainer.getBoundingClientRect().width / 2}px)`
-     
-        
-
       }
     }
 
-    if (sectionButtonContainer) {
-      sectionButtonContainer.style.top = `calc(50% - ${sectionButtonContainer.getBoundingClientRect().height / 2}px)`
-    }
-
+    sectionButtonContainer.style.top = `calc(50% - ${sectionButtonContainer.getBoundingClientRect().height / 2}px)`
   }
 
  
