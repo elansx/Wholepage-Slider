@@ -2,6 +2,8 @@
 
 You can see a working [demo here](https://elansx.github.io/Wholepage-Slider/)
 
+![Whole Page Slider](https://i.imgur.com/M6s4n7B.gif "Whole Page Slider")
+
 ## Features
 
 * No dependencies
