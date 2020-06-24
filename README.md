@@ -16,7 +16,7 @@ You can see a working [demo here](https://elansx.github.io/Wholepage-Slider/)
 ### Quick start
 
 Copy and paste this in your html file, but –
-I strongly recommend to download and use local files instead of using CDN links, because API can change.
+I strongly recommend to download and use local files instead of using CDN links, because of regular API changes.
 
 ```
 <!DOCTYPE html>
@@ -98,7 +98,7 @@ new WholePageSlider(options)
 new WholePageSlider({
     containerId: 'wholepage',
     sectionClass: 'mySection',
-    pageClass: 'myPage,
+    pageClass: 'myPage',
     colors: ['deepskyblue', 'yellow', '#dddddd']
 })
 ```
