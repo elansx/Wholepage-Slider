@@ -1,7 +1,7 @@
 body, html {
     margin: 0;
     padding: 0;
-    font-family: 'Poppins', 'roboto';
+    font-family: 'roboto';
 
 }
 
@@ -19,14 +19,11 @@ body {
 h1 {
     font-size: calc(2em + 1vw);
     margin: 0; padding: 0;
-    font-weight: 600;
-    text-align: center;
 }
 
 p {
-    font-weight: 200;
+    font-weight: 100;
     font-size: calc(1em + 0.5vw);
-    text-align: center;
 }
 
 #wholepage {
@@ -37,7 +34,7 @@ p {
     overflow: hidden;
 }
 
-section {
+section, .section {
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -90,9 +87,9 @@ section {
     content: '';
     display: inline-flex;
     position: relative;
-    top: -8px;
-    left: -8px;
-    padding: 10px;
+    top: -10px;
+    left: -10px;
+    padding: 12px;
 }
 
 .sectionButtonContainer input[type=radio]:checked + label::after, .page_selection input[type=radio]:checked + label::after {
