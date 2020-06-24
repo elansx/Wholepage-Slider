@@ -1,5 +1,5 @@
 import WholePageSlider from './slider';
 
-new WholePageSlider("wholepage", {
+new WholePageSlider({
     colors: ['deepskyblue', 'orange', 'white', 'lightgrey']
 });

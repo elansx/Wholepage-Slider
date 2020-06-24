@@ -1,39 +1,47 @@
-import './slider.scss';
-import { Options, Directions, Translate, Touches } from './types';
+import './slider.css';
 
 export default class WholePageSlider {
-  private container: HTMLElement
-  private sections: HTMLCollectionOf<HTMLElement>
-  private pagesPerSection: HTMLCollectionOf<HTMLElement>[] = []
-  private currentPage: number[] = []
-  private currentSection: number = 0
-  private isDragging: boolean = false
-  private draggingPercent: number = 20
-  private waitAnimation: boolean = false
-  private timeToAnimate: number = 300
-  private height: number = 100
-  private width: number = 100
-  private swipeStartDirection: Directions = null
-  private swipeEndDirection: Directions = null
-  private translate: Translate = {
-    section: 0,
-    page: []
-  }
-  private touches: Touches = {
-    startX: null,
-    startY: null,
-    endX: null,
-    endY: null,
-    differenceX: null,
-    differenceY: null
-  }
+  constructor (options = {}) {
+    this.container = options.containerId ? document.getElementById(options.containerId) : document.body
+    this.sections = options.sectionClass ? document.getElementsByClassName(options.sectionClass) : document.getElementsByTagName('section')
+    this.pageClass = options.pageClass ? options.pageClass : 'page'
 
-  constructor (containerId: string, readonly options: Options = {}) {
-    this.container = document.getElementById(containerId)
-    this.sections = document.getElementsByTagName('section')
+    this.pagesPerSection = []
+    this.currentPage = []
+    this.currentSection = 0
+
+    this.isDragging = false
+    this.draggingPercent = 20
+
+    this.waitAnimation = false
+    this.timeToAnimate = 300
+    
+    this.height = 100
+    this.width = 100
+
+    this.swipeStartDirection = null
+    this.swipeEndDirection = null
+    
+    this.options = {
+      ...options
+    }
+    this.translate = {
+      section: 0,
+      page: []
+    }
+    
+    this.touches = {
+      startX: null,
+      startY: null,
+      endX: null,
+      endY: null,
+      differenceX: null,
+      differenceY: null
+    }
     
     this.init()
     this.setupEventListeners()
+
   }
 
   init () {
@@ -43,11 +51,16 @@ export default class WholePageSlider {
     // Create elements for every section and apply styles
     for (let index = 0; index < this.sections.length; index++) {
 
+      // Count and add page Starting position for every section
       this.translate.page[index] = 0
       this.currentPage[index] = 0
-      this.sections[index].style.background = this.options.colors ? this.options.colors[index] : 'white'
-      this.pagesPerSection[index] = (this.sections[index].getElementsByClassName('page') as HTMLCollectionOf<HTMLElement>)
-
+      this.pagesPerSection[index] = this.sections[index].getElementsByClassName(this.pageClass)
+      
+      // Apply background color for section
+      if (this.options.colors) {
+        this.sections[index].style.background = this.options.colors[index] ? this.options.colors[index] : 'white'
+      }
+      
       // We need to be sure that there is more then 1 section before creating navigation
       if (this.sections.length > 1) {
 
@@ -57,7 +70,15 @@ export default class WholePageSlider {
           name: 'sectionScrollButton',
           id: `sectionId[${index}]`,
           value: index,
-          onclick: this.switchAndTranslateSection.bind(this),
+          onclick: function (event) {
+
+            if (this.waitAnimation) {
+              return event.preventDefault()
+            } else {
+              this.switchAndTranslateSection(event) 
+            }
+
+          }.bind(this),
           checked: this.currentSection === index,
           style: {
             display: 'none'
@@ -69,11 +90,10 @@ export default class WholePageSlider {
         
       }
 
-
       // Create navigation for pages only if there is more than 1 page per section
       if (this.pagesPerSection[index].length > 1) {
         
-        const buttonContainer = this.createElement('div', { id: `pageButtonContainer[${index}]`, className: 'page_selection' }, this.sections[index])
+        const pageButtonContainer = this.createElement('div', { id: `pageButtonContainer[${index}]`, className: 'page_selection' }, this.sections[index])
 
         for (let i = 0; i < this.pagesPerSection[index].length; i++) {
 
@@ -84,25 +104,31 @@ export default class WholePageSlider {
             name: `pagination[${index}]`,
             value: i,
             checked: this.currentPage[i] === i,
-            onclick: this.switchAndTranslatePage.bind(this),
+            onclick: function (event) {
+
+              if (this.waitAnimation) {
+                return event.preventDefault()
+              } else {
+                this.switchAndTranslatePage(event) 
+              }
+            
+            }.bind(this),
             style: {
               display: 'none'
             }
-          }, buttonContainer)
+          }, pageButtonContainer)
 
           // Give some custom style for radio buttons with labels
-          this.createElement('label', { htmlFor: `page[${index}][${i}]` }, buttonContainer)
+          this.createElement('label', { htmlFor: `page[${index}][${i}]` }, pageButtonContainer)
 
         }
-
-        buttonContainer.style.left = `calc(50% - ${buttonContainer.getBoundingClientRect().width / 2}px)`
+        // Align container to center, because we never know how wide container will be after all buttons added 
+        pageButtonContainer.style.left = `calc(50% - ${pageButtonContainer.getBoundingClientRect().width / 2}px)`
       }
     }
-
+    // Same thing as pageButtonContainer, but only with height 
     sectionButtonContainer.style.top = `calc(50% - ${sectionButtonContainer.getBoundingClientRect().height / 2}px)`
   }
-
- 
 
   switchAndTranslateSection (swipeOrClick) {
    
@@ -114,11 +140,11 @@ export default class WholePageSlider {
     }
 
     // Handle swipe or click for sections (UP/DOWN)
-    if (((swipeOrClick.deltaY > 0 || swipeOrClick === 'up') && this.swipeStartDirection !== 'down') && (this.currentSection < this.sections.length - 1)) {
+    if (((swipeOrClick.deltaY > 0 || swipeOrClick === 'down') && this.swipeStartDirection !== 'up') && (this.currentSection < this.sections.length - 1)) {
       this.currentSection++
       this.translate.section -= this.height
     } else
-    if (((swipeOrClick.deltaY < 0 || swipeOrClick === 'down') && this.swipeStartDirection !== 'up') && (this.currentSection > 0)) {
+    if (((swipeOrClick.deltaY < 0 || swipeOrClick === 'up') && this.swipeStartDirection !== 'down') && (this.currentSection > 0)) {
       this.currentSection--
       this.translate.section += this.height
     } else  
@@ -134,14 +160,13 @@ export default class WholePageSlider {
     // This is needed to show active page on navigation buttons
     const button = document.getElementById(`sectionId[${this.currentSection}]`)
     if (button) {
-      (button as any).checked = true
+      button.checked = true
     }
    
     // Reset settings after swipe, drag or click ended
     this.isDragging = false
     this.height = 100
     
-
     // Animate/translate sections
     for (let index = 0; index < this.sections.length; index++) {
       this.sections[index].style.transform = `translateY(${this.translate.section}%)`
@@ -153,16 +178,18 @@ export default class WholePageSlider {
     }, this.timeToAnimate)
   }
 
-
-
   switchAndTranslatePage (swipeOrClick) {
 
+    if (!this.sections || this.sections.length < 1 || this.waitAnimation) {
+      return
+    } 
+
     // Handle swipe or click for pages (LEFT/RIGHT)
-    if (swipeOrClick === 'left' && this.swipeStartDirection !== 'right' && (this.currentPage[this.currentSection] < this.pagesPerSection[this.currentSection].length - 1)) {
+    if (swipeOrClick === 'right' && this.swipeStartDirection !== 'left' && (this.currentPage[this.currentSection] < this.pagesPerSection[this.currentSection].length - 1)) {
       this.currentPage[this.currentSection]++
       this.translate.page[this.currentSection] -= this.width
     } else
-    if (swipeOrClick === 'right' && this.swipeStartDirection !== 'left' && (this.currentPage[this.currentSection] > 0)) {
+    if (swipeOrClick === 'left' && this.swipeStartDirection !== 'right' && (this.currentPage[this.currentSection] > 0)) {
       this.currentPage[this.currentSection]--
       this.translate.page[this.currentSection] += this.width
     } else
@@ -182,7 +209,7 @@ export default class WholePageSlider {
     // This is needed to show active page on navigation buttons
     const button = document.getElementById(`page[${this.currentSection}][${this.currentPage[this.currentSection]}]`)
     if (button) {
-      (button as any).checked = true
+      button.checked = true
     }
     
     // Animate/translate pages
@@ -196,9 +223,8 @@ export default class WholePageSlider {
     }, this.timeToAnimate)
   }
 
-
-
   draggingEffect () {
+    
     if (!this.isDragging) {
       return
     }
@@ -212,11 +238,12 @@ export default class WholePageSlider {
       // Get all pages for current section
       const pages = this.pagesPerSection[this.currentSection]
 
-      if (this.swipeStartDirection === 'left') {
+      // Handle dragging effect
+      if (this.swipeStartDirection === 'right') {
         this.width -= this.draggingPercent
         this.translate.page[this.currentSection] -= this.draggingPercent
       } else
-      if (this.swipeStartDirection === 'right') {
+      if (this.swipeStartDirection === 'left') {
         this.width -= this.draggingPercent
         this.translate.page[this.currentSection] += this.draggingPercent
       }
@@ -230,11 +257,12 @@ export default class WholePageSlider {
     // Check if dragging veritcal and we are not waiting for any previous animation to complete
     if ((this.swipeStartDirection === 'up' || this.swipeStartDirection === 'down') && !this.waitAnimation) {
      
-      if (this.swipeStartDirection === 'up') {
+      // Handle dragging effect
+      if (this.swipeStartDirection === 'down') {
         this.height -= this.draggingPercent
         this.translate.section -= this.draggingPercent
       } else
-      if (this.swipeStartDirection === 'down') {
+      if (this.swipeStartDirection === 'up') {
         this.height -= this.draggingPercent
         this.translate.section += this.draggingPercent
       }
@@ -249,21 +277,17 @@ export default class WholePageSlider {
     this.isDragging = false
   }
 
-
   // Check if it is Mobile or Desktop device
   getTouchOrClick (event) {
     const touch = event.touches ? event.touches[0] : event
     return touch
   }
 
-
   touchStart (event) {
     this.isDragging = true 
     this.touches.startX = this.getTouchOrClick(event).clientX
     this.touches.startY = this.getTouchOrClick(event).clientY
   }
-
-
 
   touchMove (event) {
     if (!this.touches.startX || !this.touches.startY) { 
@@ -278,15 +302,13 @@ export default class WholePageSlider {
 
     // We need to know vertical or horizontal swipe accured and then left/right or up/down
     if (Math.abs(this.touches.differenceX) > Math.abs(this.touches.differenceY)) {
-      this.swipeEndDirection = this.touches.differenceX > 0 ? 'left' : 'right'
+      this.swipeEndDirection = this.touches.differenceX > 0 ? 'right' : 'left'
     } else {
-      this.swipeEndDirection = this.touches.differenceY > 0 ? 'up' : 'down'
+      this.swipeEndDirection = this.touches.differenceY > 0 ? 'down' : 'up'
     }
 
     this.draggingEffect()
   }
-
-
 
   touchEnd () {
     if (this.swipeEndDirection) {   
@@ -300,8 +322,33 @@ export default class WholePageSlider {
     this.swipeStartDirection = null
     this.swipeEndDirection = null
   }
-  
 
+  swipeWithKeyboard (event) {
+
+    if (event.keyCode === 37 || event.code === 'ArrowLeft') {
+      this.swipeEndDirection = 'left'
+    } else
+       
+    if (event.keyCode === 38 || event.code === 'ArrowUp') {
+      this.swipeEndDirection = 'up'
+    } else
+
+    if (event.keyCode === 39 || event.code === 'ArrowRight') {
+      this.swipeEndDirection = 'right'
+    } else 
+
+    if (event.keyCode === 40 || event.code === 'ArrowDown') {
+      this.swipeEndDirection = 'down'
+    }
+
+    // Check if any of allowed keys pressed only then execute function
+    if (this.swipeEndDirection && !this.waitAnimation) {
+      this.switchAndTranslatePage(this.swipeEndDirection)
+      this.switchAndTranslateSection(this.swipeEndDirection)
+    }
+
+  }
+  
   createElement (tag, options, parent) {
     try {
       const getParent = (typeof parent) === 'object' ? parent : document.getElementById(parent)
@@ -341,8 +388,8 @@ export default class WholePageSlider {
     window.ontouchstart = this.touchStart.bind(this)
     window.ontouchmove = this.touchMove.bind(this)
     window.ontouchend = this.touchEnd.bind(this)
+    window.onkeyup = this.swipeWithKeyboard.bind(this)
   }
-
 
   handleError (string, error) {
     console.warn(`${string}: `, error)
