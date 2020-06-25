@@ -19,11 +19,13 @@ body {
 h1 {
     font-size: calc(2em + 1vw);
     margin: 0; padding: 0;
+    text-align: center;
 }
 
 p {
     font-weight: 100;
     font-size: calc(1em + 0.5vw);
+    text-align: center;
 }
 
 #wholepage {
