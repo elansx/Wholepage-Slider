@@ -12,7 +12,7 @@ const WholePageSlider = class {
     this.draggingPercent = 20
 
     this.waitAnimation = false
-    this.timeToAnimate = 300
+    this.timeToAnimate = 500
     
     this.height = 100
     this.width = 100
@@ -129,7 +129,6 @@ const WholePageSlider = class {
   }
 
   switchAndTranslateSection (swipeOrClick) {
-   
     // If we have no sections created or have to wait for animation to complete - return
     if (!this.sections || this.sections.length < 1 || this.waitAnimation) {
       return
