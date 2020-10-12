@@ -19,7 +19,9 @@ const WholePageSlider = class {
 
     this.swipeStartDirection = null
     this.swipeEndDirection = null
-    
+
+    this.swipeSensitivity = 5
+
     this.options = {
       ...options
     }
@@ -296,6 +298,12 @@ const WholePageSlider = class {
 
     this.touches.differenceX = this.touches.startX - this.touches.endX
     this.touches.differenceY = this.touches.startY - this.touches.endY
+
+    // Discard this if we're under swipeSensitivity in both directions
+    if (Math.abs(this.touches.differenceX) < this.swipeSensitivity
+        && Math.abs(this.touches.differenceY) < this.swipeSensitivity) {
+        return
+    }
 
     // We need to know vertical or horizontal swipe accured and then left/right or up/down
     if (Math.abs(this.touches.differenceX) > Math.abs(this.touches.differenceY)) {
